@@ -5,24 +5,26 @@ import time
 from removeAccents import removeAccents
 from selenium.common.exceptions import NoSuchElementException
 
-# Set up browser with selenium.
 chrome_options = Options()
 chrome_options.add_argument("--headless")
-# path_do_diver = 'webscrape_PV/chromedriver'
-driver = webdriver.Chrome(options=chrome_options)
+path_do_diver = '/Users/kacperdzida/PycharmProjects/webscrape_PV/chromedriver'
+driver = webdriver.Chrome(path_do_diver, options=chrome_options)
 
 company_list = []
 pause_time = 2  # Pause time was implemented to make sure, that sites loaded properly.
 
-# Get content of the first list. Done seperately as it has different url construction.
+# Get content of the first list. Done separately as it has different url construction.
 page = driver.get("https://gramwzielone.pl/baza-firm")
 time.sleep(pause_time)
 box = driver.find_element_by_xpath('//*[@id="gwz-content"]/div[1]/div[1]/div/span/span/div[4]')
 company_list.append(box.text.split('\n')[1::3])
+print('Companies from page 1 saved.')
 
 # Get content of the remaining sites.
-for page in range(2, 5):
-    page = driver.get(f'https://www.gramwzielone.pl/baza-firm/35/fotowoltaika/strona/{page}')
+number_of_pages = 233  # number of pages should be defined before running the script
+
+for page in range(2, number_of_pages+1):
+    driver.get(f'https://www.gramwzielone.pl/baza-firm/35/fotowoltaika/strona/{page}')
     time.sleep(pause_time)
     data_box = driver.find_element_by_xpath('//*[@id="gwz-content"]/div[1]/div[1]/div/span/span/div[4]')
     company_list.append(data_box.text.split('\n')[1::3])
@@ -51,9 +53,10 @@ for company in company_urls:
         time.sleep(pause_time)
         data_box = driver.find_element_by_xpath('//*[@id="gwz-content"]/div[1]/div[1]/div')
         company_data.append(data_box.text.split('\n')[:16])
+        print(f'Data for company {company_urls.index(company)}. {company} collected.')
     except NoSuchElementException:
         list_of_errors.append(company)
-    print(f'Data for company {company_urls.index(company)}. {company} collected.')
+        print(f'Error occurred for company: {company_urls.index(company)}. {company}.')
 
 # Turn list of collected data into DataFrame
 companies_df = pd.DataFrame(company_data)
