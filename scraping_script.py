@@ -4,10 +4,11 @@ from selenium.webdriver.chrome.options import Options
 import time
 from removeAccents import removeAccents
 from selenium.common.exceptions import NoSuchElementException
+import os
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")
-path_do_diver = '/Users/kacperdzida/PycharmProjects/webscrape_PV/chromedriver'
+path_do_diver = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'chromedriver')
 driver = webdriver.Chrome(path_do_diver, options=chrome_options)
 
 company_list = []
@@ -23,7 +24,7 @@ print('Companies from page 1 saved.')
 # Get content of the remaining sites.
 number_of_pages = 233  # number of pages should be defined before running the script
 
-for page in range(2, number_of_pages+1):
+for page in range(2, 3):
     driver.get(f'https://www.gramwzielone.pl/baza-firm/35/fotowoltaika/strona/{page}')
     time.sleep(pause_time)
     data_box = driver.find_element_by_xpath('//*[@id="gwz-content"]/div[1]/div[1]/div/span/span/div[4]')
